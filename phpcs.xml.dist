@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress snippets">
+	<description>WordPress Coding Standards for the PHP snippets.</description>
+
+	<file>.</file>
+	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+
+	<config name="minimum_wp_version" value="6.5"/>
+	<config name="testVersion" value="8.0-"/>
+
+	<rule ref="WordPress">
+		<!-- Snippet files are named after the problem they solve. -->
+		<exclude name="WordPress.Files.FileName"/>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="wp-snippets"/>
+				<!-- Reuses Elementor Pro's own translation of "No Label". -->
+				<element value="elementor-pro"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="wpsnip"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

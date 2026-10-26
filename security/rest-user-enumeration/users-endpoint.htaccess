@@ -1,0 +1,24 @@
+# Optional server-level layer for rest-user-enumeration.php.
+# Place above the "# BEGIN WordPress" block. Requires mod_rewrite.
+#
+# Requests that carry credentials (an Authorization header or a WordPress
+# login cookie) go through to WordPress, which checks them. The PHP snippet
+# stays the authoritative rule: a cookie can be faked to get past this layer,
+# but not past WordPress.
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+RewriteCond %{HTTP:Authorization} ^$
+RewriteCond %{HTTP_COOKIE} !wordpress_logged_in_ [NC]
+# Pretty permalinks: /wp-json/wp/v2/users and /wp-json/wp/v2/users/123 only.
+# /users/me and /users/{id}/application-passwords stay reachable.
+RewriteCond %{REQUEST_URI} (^|/)wp-json/wp/v2/users(/[0-9]+)?/?$ [NC]
+RewriteRule ^ - [F,L]
+
+RewriteCond %{HTTP:Authorization} ^$
+RewriteCond %{HTTP_COOKIE} !wordpress_logged_in_ [NC]
+# Plain permalinks: ?rest_route=/wp/v2/users, also URL-encoded (%2F).
+RewriteCond %{QUERY_STRING} (^|&)rest_route=(/|%2F)wp(/|%2F)v2(/|%2F)users((/|%2F)[0-9]+)?(/|%2F)?(&|$) [NC]
+RewriteRule ^ - [F,L]
+</IfModule>

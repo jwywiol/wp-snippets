@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: PHP syntax
+        run: find . -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: WordPress Coding Standards
+        run: |
+          composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          composer global require --no-interaction wp-coding-standards/wpcs:^3
+          "$(composer global config bin-dir --absolute --quiet)/phpcs" --standard=phpcs.xml.dist
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: JavaScript syntax
+        run: find . -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check
+
+      - name: Python syntax
+        run: find . -name '*.py' -print0 | xargs -0 -n1 python3 -m py_compile

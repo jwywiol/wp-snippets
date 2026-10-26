@@ -1,0 +1,18 @@
+# Allow wp-cron.php only with a secret key in the URL.
+# Place above the "# BEGIN WordPress" block. Requires mod_rewrite.
+# Replace CHANGE_ME with a long random string (letters and digits).
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+# (/.*)? also catches /wp-cron.php/anything, which Apache can run as wp-cron.php (PATH_INFO).
+RewriteCond %{REQUEST_URI} (^|/)wp-cron\.php(/.*)?$ [NC]
+RewriteCond %{QUERY_STRING} !(^|&)cron_key=CHANGE_ME(&|$)
+RewriteRule ^ - [F,L]
+</IfModule>
+
+# If this file also blocks bots by user agent (wget, curl, python, ...),
+# exempt wp-cron.php there, or the host's wget-based cron gets a 403 as well:
+#
+#   RewriteCond %{REQUEST_URI} !(^|/)wp-cron\.php(/.*)?$ [NC]
+#   RewriteCond %{HTTP_USER_AGENT} (curl|wget|python) [NC]
+#   RewriteRule ^ - [F,L]
